@@ -1,113 +1,147 @@
+/** @format */
+
+"use client";
+/** @format */
+
 import Image from "next/image";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+import bgHeaderDesktop from "@/assets/images/bg-header-desktop.svg";
+import bgHeaderMobile from "@/assets/images/bg-header-mobile.svg";
+import JobCard, { JobType } from "@/components/JobCard";
+import { IoCloseSharp } from "react-icons/io5";
+import { useState, useEffect } from "react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
+import data from "@/assets/data.json";
+
+export default function Home() {
+  const [animationParent] = useAutoAnimate();
+  const [activeTags, setActiveTags] = useState<string[]>([]);
+  const [fiterData, setFilterData] = useState<JobType[]>(data);
+
+  useEffect(() => {
+    const newFitlerData =
+      activeTags.length > 0
+        ? data.filter(
+            (item) =>
+              item.languages.some((t) => activeTags.includes(t)) ||
+              item.tools.some((t) => activeTags.includes(t))
+          )
+        : data;
+    setFilterData(newFitlerData);
+  }, [activeTags]);
+
+  console.log("activeTags", activeTags);
+  // html
+  function handleClick(tag: string) {
+    if (!activeTags.includes(tag)) {
+      setActiveTags([...activeTags, tag]);
+    } else {
+      // ['html','css','python']
+      // html
+
+      // const updatedTags = activeTags.filter((t) => t !== tag);
+      const updatedTags = activeTags.filter((t) => t !== tag);
+      // html === html ✔️
+      // js === html  ❌
+      // python === html  ❌
+
+      // html === html  ❌
+      // js === html  ✔️
+      // python === html  ✔️
+
+      setActiveTags(updatedTags);
+    }
+  }
+
+  function handleClose(tag: string) {
+    const updatedTags = activeTags.filter((t) => t !== tag);
+
+    setActiveTags(updatedTags);
+  }
+
+  function handleClear() {
+    setActiveTags([]);
+  }
+  return (
+    <div className="min-h-screen w-full  bg-[hsl(180,52%,96%)] flex-col flex gap-12">
+      <div className="w-full bg-[hsl(180,29%,50%)]">
         <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+          className="w-full md:hidden "
+          src={bgHeaderMobile}
+          alt="bg-header-desktop"
+        />
+        <Image
+          className="w-full hidden md:flex"
+          src={bgHeaderDesktop}
+          alt="bg-header-desktop"
         />
       </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
+      {/*  */}
+      <section className=" px-6 pb-8">
+        <main
+          ref={animationParent}
+          className="h-full w-full flex-col flex items-center gap-10  md:gap-5  mx-auto max-w-[950px] relative  "
         >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+          {/* filter container */}
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+          {activeTags.length > 0 && (
+            <div className="bg-white shadow-lg w-full py-4 px-6 rounded-md absolute top-[-80px] flex justify-between">
+              {/* filters */}
+              <div ref={animationParent} className="flex gap-3 flex-wrap">
+                {activeTags.map((d, i) => (
+                  <button
+                    key={i}
+                    className="flex  items-center rounded overflow-hidden "
+                    // key={i}
+                  >
+                    {/* {d} */}
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+                    <p className="text-desaturated-cyan  bg-[hsl(180,52%,96%)] px-2 py-0.5  font-bold  text-sm">
+                      {d}
+                    </p>
+                    <div
+                      onClick={() => handleClose(d)}
+                      className="bg-desaturated-cyan hover:bg-slate-800 text-white px-2 py-1"
+                    >
+                      <IoCloseSharp />
+                    </div>
+                  </button>
+                ))}
+              </div>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+              <button
+                onClick={handleClear}
+                className="text-sm font-semibold text-gray-500 hover:text-desaturated-cyan hover:underline "
+              >
+                Clear
+              </button>
+            </div>
+          )}
+          {/* card component */}
+          {fiterData.map((d, i) => (
+            <JobCard
+              activeTags={activeTags}
+              handleClick={handleClick}
+              key={i}
+              company={d.company}
+              contract={d.contract}
+              featured
+              id={d.id}
+              level={d.level}
+              location={d.location}
+              logo={d.logo}
+              new={d.new}
+              position={d.position}
+              postedAt={d.postedAt}
+              role={d.role}
+              languages={d.languages}
+              tools={d.tools}
+            />
+          ))}
+        </main>
+      </section>
+    </div>
   );
 }
